@@ -1,4 +1,4 @@
-import { loadDecisions, saveDecisions, generateId } from './helpers.js';
+import { loadDecisions, queueSaveDecisions as saveDecisions, generateId } from './helpers.js';
 import { renderDailyTasks } from './daily.js';
 import { renderGoalsAndSubitems } from './goals.js';
 import { initAuth } from './auth.js';

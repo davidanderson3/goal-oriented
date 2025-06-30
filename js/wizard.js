@@ -1,5 +1,5 @@
 import { parseNaturalDate } from './helpers.js';
-import { generateId, loadDecisions, saveDecisions, saveGoalOrder } from './helpers.js';
+import { generateId, loadDecisions, queueSaveDecisions as saveDecisions, saveGoalOrder } from './helpers.js';
 import { renderGoalsAndSubitems } from './goals.js';
 import { getCurrentUser } from './auth.js';
 

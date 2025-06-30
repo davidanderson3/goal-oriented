@@ -1,6 +1,6 @@
 // ── tasks.js ──
 
-import { loadDecisions, saveDecisions, generateId } from './helpers.js';
+import { loadDecisions, queueSaveDecisions as saveDecisions, generateId } from './helpers.js';
 import { enableTaskDragAndDrop } from './dragAndDrop.js';
 import { createGoalRow } from './goals.js';
 

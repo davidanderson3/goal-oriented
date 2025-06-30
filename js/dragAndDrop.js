@@ -1,5 +1,5 @@
 
-import { saveGoalOrder, loadDecisions, saveDecisions } from './helpers.js';
+import { saveGoalOrder, loadDecisions, queueSaveDecisions as saveDecisions } from './helpers.js';
 
 let dragSrcEl = null;
 

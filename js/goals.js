@@ -5,7 +5,7 @@ import {
 
 import {
     loadDecisions,
-    saveDecisions,
+    queueSaveDecisions as saveDecisions,
     saveGoalOrder
 } from './helpers.js';
 

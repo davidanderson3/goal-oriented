@@ -125,5 +125,25 @@ export async function saveLists(lists) {
           .set({ lists: sanitized }, { merge: true });
 }
 
+// ── helper: debounce async functions ────────────────────────────────
+export function debounceAsync(fn, delay) {
+  let timer;
+  let latestArgs;
+  let resolvers = [];
+  return (...args) => {
+    latestArgs = args;
+    clearTimeout(timer);
+    timer = setTimeout(async () => {
+      const result = await fn(...latestArgs);
+      resolvers.forEach(r => r(result));
+      resolvers = [];
+    }, delay);
+    return new Promise(res => resolvers.push(res));
+  };
+}
+
+// Expose a debounced saveDecisions to batch rapid updates
+export const queueSaveDecisions = debounceAsync(saveDecisions, 250);
+
 
 
