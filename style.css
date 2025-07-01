@@ -67,13 +67,20 @@ body {
 }
 
 .navbar-left {
+  display: flex;
+  align-items: center;
   font-weight: bold;
   font-size: 1.8em;
 }
 
+.navbar-left img.logo {
+  height: 40px;
+  margin-right: 10px;
+}
+
 .navbar-right button {
   margin-left: 10px;
-  background-color: rgba(25x5, 255, 255, 0.85);
+  background-color: rgba(255, 255, 255, 0.85);
   color: #3c5c50;
   border: 1px solid #a4cbb5;
   padding: 6px 12px;
@@ -599,32 +606,6 @@ button:hover {
   background-blend-mode: overlay;
 }
 
-/* move the flex and padding into the inner container */
-.navbar-inner {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 0;
-  /* vertical padding only (horizontal comes from .container) */
-}
-
-.navbar-left {
-  font-weight: bold;
-  font-size: 1.8em;
-}
-
-.navbar-right button {
-  margin-left: 10px;
-  background-color: rgba(255, 255, 255, 0.85);
-  color: #3c5c50;
-  border: 1px solid #a4cbb5;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
 
 
 /* ------------------------------
