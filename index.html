@@ -59,6 +59,7 @@
       <button class="tab-button" data-target="dailyPanel">Daily</button>
       <button class="tab-button" data-target="metricsPanel">Metrics</button>
       <button class="tab-button" data-target="listsPanel">Lists</button>
+      <button class="tab-button" data-target="reportPanel">Reports</button>
     </div>
 
     <!-- TABS CONTENT PANELS -->
@@ -127,12 +128,32 @@
     </div>
 
     <!-- LISTS PANEL -->
-    <div id="listsPanel" class="main-layout" style="display:none">
-      <div class="full-column">
-        <h2>Lists</h2>
-        <!-- lists.js will inject the form and rendered lists here -->
+  <div id="listsPanel" class="main-layout" style="display:none">
+    <div class="full-column">
+      <h2>Lists</h2>
+      <!-- lists.js will inject the form and rendered lists here -->
+    </div>
+  </div>
+
+  <!-- REPORT PANEL -->
+  <div id="reportPanel" class="main-layout" style="display:none">
+    <div class="left-column">
+      <div class="report-panel">
+        <h2>Daily Task Completion Report</h2>
+        <table id="reportTable">
+          <thead>
+            <tr id="headerRow">
+              <th>Task</th>
+              <!-- Date columns will be injected here -->
+            </tr>
+          </thead>
+          <tbody id="reportBody">
+            <!-- Task rows will be injected here -->
+          </tbody>
+        </table>
       </div>
     </div>
+  </div>
   </section>
 
   <script type="module" src="js/main.js"></script>

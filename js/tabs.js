@@ -1,6 +1,6 @@
 export function initTabs(currentUser, db) {
   const tabButtons = document.querySelectorAll('.tab-button');
-  const panels    = ['goalsPanel','calendarPanel','dailyPanel','metricsPanel','listsPanel'];
+  const panels    = ['goalsPanel','calendarPanel','dailyPanel','metricsPanel','listsPanel','reportPanel'];
 
   tabButtons.forEach(btn => {
     btn.addEventListener('click', async () => {
@@ -28,6 +28,9 @@ export function initTabs(currentUser, db) {
       else if (target === 'listsPanel') {
         await window.initListsPanel(currentUser, db);
       }
+      else if (target === 'reportPanel') {
+        await window.renderDailyTaskReport(currentUser, db);
+      }
     });
   });
 
@@ -51,6 +54,9 @@ export function initTabs(currentUser, db) {
     }
     else if (initial === 'listsPanel') {
       window.initListsPanel(currentUser, db);
+    }
+    else if (initial === 'reportPanel') {
+      window.renderDailyTaskReport(currentUser, db);
     }
   });
 }
