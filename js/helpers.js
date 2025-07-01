@@ -129,16 +129,21 @@ export async function saveLists(lists) {
 export function debounceAsync(fn, delay) {
   let timer;
   let latestArgs;
-  let resolvers = [];
+  let waiters = [];
   return (...args) => {
     latestArgs = args;
     clearTimeout(timer);
     timer = setTimeout(async () => {
-      const result = await fn(...latestArgs);
-      resolvers.forEach(r => r(result));
-      resolvers = [];
+      try {
+        const result = await fn(...latestArgs);
+        waiters.forEach(({ resolve }) => resolve(result));
+      } catch (err) {
+        waiters.forEach(({ reject }) => reject(err));
+      } finally {
+        waiters = [];
+      }
     }, delay);
-    return new Promise(res => resolvers.push(res));
+    return new Promise((resolve, reject) => waiters.push({ resolve, reject }));
   };
 }
 
