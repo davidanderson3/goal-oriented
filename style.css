@@ -933,6 +933,13 @@ h2 {
   border: 1px solid #d0decf;
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.report-panel canvas {
+  width: 100%;
+  max-width: 100%;
+}
+
 /* Ensure list tables remain readable on mobile */
 #listsPanel table {
   width: 100%;
