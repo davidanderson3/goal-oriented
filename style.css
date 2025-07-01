@@ -762,17 +762,30 @@ body {
 }
 
 #goalsView .tabs button {
-  margin-right: 12px;
+  margin-right: 0;
   padding: 8px 16px;
-  background: #7aa68c;
-  color: #fff;
-  border-radius: 4px 4px 0 0;
-  border: 1px solid #638b76;
+  background: #e8efe9;
+  background-image: url('https://www.transparenttextures.com/patterns/paper-1.png');
+  background-repeat: repeat;
+  color: #275539;
+  border-radius: 6px 6px 0 0;
+  border: 1px solid #b1c8b6;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out,
+              color 0.2s ease-in-out;
 }
 
-#goalsView .tabs button.active,
-#goalsView .tabs button:hover {
-  background: #638b76;
+#goalsView .tabs button.active {
+  background: #7aa68c;
+  background-image: url('https://www.transparenttextures.com/patterns/paper-1.png');
+  background-repeat: repeat;
+  color: #fff;
+  border-color: #638b76;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#goalsView .tabs button:hover:not(.active) {
+  background: #dfe9e2;
 }
 
 #goalsView .tabs .container {

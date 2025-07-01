@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "purge:css": "purgecss --config purgecss.config.js --output ./clean-css"
+    "purge:css": "purgecss --config purgecss.config.js --output ./clean-css",
+    "test": "vitest"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +14,7 @@
     "firebase": "^11.8.1"
   },
   "devDependencies": {
-    "purgecss": "^7.0.2"
+    "purgecss": "^7.0.2",
+    "vitest": "^3.2.4"
   }
 }

@@ -153,6 +153,43 @@ function applyUnitLabels(cfg) {
   }[cfg.unit] || cfg.unit;
 }
 
+let metricChartInstance = null;
+
+async function showMetricGraph(cfg) {
+  const allStats = await loadAllStats();
+  const labels = [];
+  const data = [];
+  Object.keys(allStats).sort().forEach(date => {
+    const entries = (allStats[date][cfg.id] || []).filter(e => !(e.extra && e.extra.postponed));
+    if (!entries.length) return;
+    const latest = entries.reduce((a, b) => a.timestamp > b.timestamp ? a : b);
+    let val = latest.value;
+    if (cfg.unit === 'list' && typeof val === 'string') {
+      val = val.split('\n').filter(l => l.trim()).length;
+    }
+    labels.push(date);
+    data.push(val);
+  });
+
+  const modal = document.getElementById('metricChartModal');
+  const canvas = document.getElementById('metricChartCanvas');
+  if (metricChartInstance) metricChartInstance.destroy();
+  metricChartInstance = new Chart(canvas.getContext('2d'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: cfg.label,
+        data,
+        fill: false,
+        borderColor: '#3e95cd'
+      }]
+    },
+    options: { responsive: true }
+  });
+  modal.style.display = 'flex';
+}
+
 async function renderStatsSummary() {
   const config = await loadMetricsConfig();
   config.forEach(cfg => {
@@ -218,7 +255,8 @@ async function renderStatsSummary() {
     const row = document.createElement('tr');
     const td1 = document.createElement('td');
     td1.textContent = cfg.label;
-    Object.assign(td1.style, { padding: '8px', borderBottom: '1px solid #ddd' });
+    Object.assign(td1.style, { padding: '8px', borderBottom: '1px solid #ddd', cursor: 'pointer', textDecoration: 'underline' });
+    td1.addEventListener('click', () => showMetricGraph(cfg));
     row.appendChild(td1);
     // inside renderStatsSummary(), in the Today’s Value cell:
     const td2 = document.createElement('td');
@@ -443,3 +481,10 @@ window._statsDebug = {
   renderStatsSummary,
   renderConfigForm
 };
+
+const metricModal = document.getElementById('metricChartModal');
+if (metricModal) {
+  metricModal.addEventListener('click', e => {
+    if (e.target === metricModal) metricModal.style.display = 'none';
+  });
+}
