@@ -396,3 +396,5 @@ document.addEventListener('DOMContentLoaded', () => {
     renderDailyTasks(currentUser, db);
   }
 });
+
+window.renderDailyTasks = renderDailyTasks;
