@@ -8,6 +8,7 @@ import { renderDailyTaskReport } from './report.js';
 import { initMetricsUI } from './stats.js';
 import { initTabs } from './tabs.js';
 import { initButtonStyles } from './buttonStyles.js';
+import { initTabReports } from './tabReports.js';
 
 window.currentUser = null;
 
@@ -57,6 +58,7 @@ window.addEventListener('DOMContentLoaded', () => {
       initTabs(null, db);
       renderGoalsAndSubitems();
       renderDailyTasks(null, db);
+      initTabReports(null, db);
       return;
     }
 
@@ -66,6 +68,7 @@ window.addEventListener('DOMContentLoaded', () => {
     initTabs(user, db);
     renderGoalsAndSubitems(user, db);
     renderDailyTasks(user, db);
+    initTabReports(user, db);
 
     if (document.getElementById('reportBody')) {
       renderDailyTaskReport(user, db);
