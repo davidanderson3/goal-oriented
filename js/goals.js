@@ -131,19 +131,26 @@ async function loadAndSyncGoals() {
     const goals = allDecisions.filter(d => d.type === 'goal' && !d.parentGoalId);
     const goalMap = Object.fromEntries(goals.map(g => [g.id, g]));
 
-    const snap = await db
-        .collection('decisions')
-        .doc(firebase.auth().currentUser.uid)
-        .get();
+    const user = firebase.auth().currentUser;
+    let goalOrder = [];
 
-    let goalOrder = Array.isArray(snap.data()?.goalOrder)
-        ? snap.data().goalOrder
-        : [];
+    if (user) {
+        const snap = await db
+            .collection('decisions')
+            .doc(user.uid)
+            .get();
 
-    const missing = goals.map(g => g.id).filter(id => !goalOrder.includes(id));
-    if (missing.length) {
-        goalOrder = [...goalOrder, ...missing];
-        await saveGoalOrder(goalOrder);
+        goalOrder = Array.isArray(snap.data()?.goalOrder)
+            ? snap.data().goalOrder
+            : [];
+
+        const missing = goals.map(g => g.id).filter(id => !goalOrder.includes(id));
+        if (missing.length) {
+            goalOrder = [...goalOrder, ...missing];
+            await saveGoalOrder(goalOrder);
+        }
+    } else {
+        goalOrder = goals.map(g => g.id);
     }
 
     const sortedGoals = goalOrder.map(id => goalMap[id]).filter(Boolean);
