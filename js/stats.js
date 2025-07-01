@@ -384,7 +384,7 @@ async function renderStatsSummary() {
         inp.type = 'text';
         inp.placeholder = cfg.unitLabel;
       }
-      inp.value = editValue || display;
+      inp.value = editValue;
       td2.appendChild(inp);
       const saveIcon = document.createElement('span');
       saveIcon.textContent = '💾';
