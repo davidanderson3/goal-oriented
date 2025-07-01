@@ -1,4 +1,8 @@
 import { getCurrentUser, db } from './auth.js';
+import { SAMPLE_DECISIONS, SAMPLE_LISTS } from "./sampleData.js";
+
+// Demo data for visitors stored in sampleData.js
+
 
 // Cache decisions in-memory to avoid repeated Firestore reads
 let decisionsCache = null;
@@ -14,8 +18,9 @@ export async function loadDecisions(forceRefresh = false) {
 
   const currentUser = getCurrentUser();
   if (!currentUser) {
-    console.warn('🚫 No current user — skipping loadDecisions');
-    return [];
+    console.warn('🚫 No current user — returning sample data');
+    decisionsCache = SAMPLE_DECISIONS;
+    return decisionsCache;
   }
   const snap = await db.collection('decisions').doc(currentUser.uid).get();
   const data = snap.data();
@@ -92,7 +97,11 @@ const LISTS_KEY = 'myLists';
 export async function loadLists() {
   const user = getCurrentUser?.();
   if (!user) {
-    return JSON.parse(localStorage.getItem(LISTS_KEY) || '[]'); // anonymous → localStorage
+    const stored = JSON.parse(localStorage.getItem(LISTS_KEY) || 'null');
+    if (Array.isArray(stored) && stored.length) {
+      return stored; // anonymous → localStorage
+    }
+    return SAMPLE_LISTS.slice();
   }
 
   const doc = await db.collection('lists').doc(user.uid).get();

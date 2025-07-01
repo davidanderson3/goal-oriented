@@ -35,21 +35,23 @@ window.addEventListener('DOMContentLoaded', () => {
   initAuth(uiRefs, async (user) => {
     window.currentUser = user;
 
-    if (!user) {
-      splash.style.display = 'flex';
-      goalsView.style.display = 'none';
-      return;
-    }
-
-    splash.style.display = 'none';
-    goalsView.style.display = '';
-
     ['goalList', 'completedList', 'dailyTasksList'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.innerHTML = '';
     });
 
     window.openGoalIds?.clear?.();
+
+    if (!user) {
+      splash.style.display = 'flex';
+      goalsView.style.display = '';
+      initTabs(null, db);
+      renderGoalsAndSubitems();
+      return;
+    }
+
+    splash.style.display = 'none';
+    goalsView.style.display = '';
 
     initTabs(user, db);
     renderGoalsAndSubitems(user, db);
