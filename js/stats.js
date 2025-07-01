@@ -127,7 +127,13 @@ async function loadAllStats() {
 
 function computeRank(val, allValues, direction) {
   if (!allValues.length) return '—';
-  const sorted = allValues.slice().sort((a, b) => direction === 'lower' ? a - b : b - a);
+  const dir = (direction || '').toLowerCase();
+  const numeric = allValues
+    .map(v => typeof v === 'string' ? parseFloat(v) : v)
+    .filter(v => typeof v === 'number' && !isNaN(v));
+  val = typeof val === 'string' ? parseFloat(val) : val;
+  if (isNaN(val) || !numeric.length) return '—';
+  const sorted = numeric.slice().sort((a, b) => dir === 'lower' ? a - b : b - a);
   const index = sorted.findIndex(v => v === val);
   return index >= 0 ? `${index + 1}/${sorted.length}` : '—';
 }
@@ -159,6 +165,7 @@ async function showMetricGraph(cfg) {
   const allStats = await loadAllStats();
   const labels = [];
   const data = [];
+  // Gather raw metric values by date
   Object.keys(allStats).sort().forEach(date => {
     const entries = (allStats[date][cfg.id] || []).filter(e => !(e.extra && e.extra.postponed));
     if (!entries.length) return;
@@ -171,6 +178,19 @@ async function showMetricGraph(cfg) {
     data.push(val);
   });
 
+  // Calculate 7-day rolling average
+  const rolling = [];
+  for (let i = 0; i < data.length; i++) {
+    const start = Math.max(0, i - 6);
+    const window = data.slice(start, i + 1).filter(v => typeof v === 'number' && !isNaN(v));
+    if (window.length) {
+      const avg = window.reduce((sum, v) => sum + v, 0) / window.length;
+      rolling.push(avg);
+    } else {
+      rolling.push(null);
+    }
+  }
+
   const modal = document.getElementById('metricChartModal');
   const canvas = document.getElementById('metricChartCanvas');
   if (metricChartInstance) metricChartInstance.destroy();
@@ -178,12 +198,21 @@ async function showMetricGraph(cfg) {
     type: 'line',
     data: {
       labels,
-      datasets: [{
-        label: cfg.label,
-        data,
-        fill: false,
-        borderColor: '#3e95cd'
-      }]
+      datasets: [
+        {
+          label: cfg.label,
+          data,
+          fill: false,
+          borderColor: '#3e95cd'
+        },
+        {
+          label: '7-day Avg',
+          data: rolling,
+          fill: false,
+          borderColor: '#e96d06',
+          borderDash: [5, 5]
+        }
+      ]
     },
     options: { responsive: true }
   });
@@ -201,12 +230,13 @@ async function renderStatsSummary() {
   const valuesByMetric = {};
   Object.values(allStats).forEach(day => {
     Object.entries(day).forEach(([id, entries]) => {
-      const latest = entries.reduce((a, b) => a.timestamp > b.timestamp ? a : b);
-      let v = latest.value;
-      if (unitByMetric[id] === 'list' && typeof v === 'string') {
-        v = v.split('\n').filter(l => l.trim()).length;
-      }
-      (valuesByMetric[id] = valuesByMetric[id] || []).push(v);
+      entries.filter(e => !(e.extra && e.extra.postponed)).forEach(entry => {
+        let v = entry.value;
+        if (unitByMetric[id] === 'list' && typeof v === 'string') {
+          v = v.split('\n').filter(l => l.trim()).length;
+        }
+        (valuesByMetric[id] = valuesByMetric[id] || []).push(v);
+      });
     });
   });
   const container = document.getElementById('genericStatsSummary');
