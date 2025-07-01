@@ -6,6 +6,10 @@ import { SAMPLE_DECISIONS, SAMPLE_LISTS } from './sampleData.js';
 // Cache decisions in-memory to avoid repeated Firestore reads
 let decisionsCache = null;
 
+export function clearDecisionsCache() {
+  decisionsCache = null;
+}
+
 export function generateId() {
   return '_' + Math.random().toString(36).substr(2, 9);
 }

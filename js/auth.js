@@ -2,6 +2,7 @@
 import "https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js";
 import "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js";
 import "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js";
+import { clearDecisionsCache } from './helpers.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyBbet_bmwm8h8G5CqvmzrdAnc3AO-0IKa8",
@@ -29,10 +30,7 @@ export function initAuth({ loginBtn, logoutBtn, userEmail }, onLogin) {
   loginBtn.onclick = async () => {
     const provider = new firebase.auth.GoogleAuthProvider(); // ✅ FIXED
     try {
-      const result = await firebase.auth().signInWithPopup(provider); // ✅ call firebase.auth()
-      currentUser = result.user;
-      safeSet(userEmail, 'textContent', currentUser.email);
-      onLogin(currentUser);
+      await firebase.auth().signInWithPopup(provider); // ✅ call firebase.auth()
     } catch (err) {
       console.error('Login failed:', err);
     }
@@ -42,15 +40,11 @@ export function initAuth({ loginBtn, logoutBtn, userEmail }, onLogin) {
 
   logoutBtn.onclick = async () => {
     await auth.signOut();
-    currentUser = null;
-    safeSet(userEmail, 'textContent', '');
-    safeSet(loginBtn, 'style', 'display: inline-block');
-    safeSet(logoutBtn, 'style', 'display: none');
-    onLogin(null);
   };
 
   auth.onAuthStateChanged(user => {
     currentUser = user;
+    clearDecisionsCache();
     safeSet(userEmail, 'textContent', user?.email || '');
     safeSet(loginBtn, 'style', user ? 'display: none' : 'display: inline-block');
     safeSet(logoutBtn, 'style', user ? 'display: inline-block' : 'display: none');
