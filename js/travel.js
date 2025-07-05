@@ -19,21 +19,19 @@ export async function initTravelPanel() {
   const list = document.getElementById('travelList');
   const ctx = canvas.getContext('2d');
 
-  travelData = JSON.parse(localStorage.getItem('travelData') || 'null');
-  if (!Array.isArray(travelData) || !travelData.length) {
-    try {
-      const snap = await db.collection('travel').get();
-      travelData = snap.docs.map(doc => doc.data());
-      if (travelData.length) {
-        localStorage.setItem('travelData', JSON.stringify(travelData));
-      }
-    } catch (err) {
-      console.error('Failed to load travel data from Firestore', err);
-      const res = await fetch('assets/travel/doc.kml');
-      const text = await res.text();
-      travelData = parseKml(text);
-      localStorage.setItem('travelData', JSON.stringify(travelData));
+  try {
+    const snap = await db.collection('travel').get();
+    travelData = snap.docs.map(doc => doc.data());
+    if (!travelData.length) {
+      throw new Error('No travel docs');
     }
+    localStorage.setItem('travelData', JSON.stringify(travelData));
+  } catch (err) {
+    console.warn('Falling back to local KML', err);
+    const res = await fetch('assets/travel/doc.kml');
+    const text = await res.text();
+    travelData = parseKml(text);
+    localStorage.setItem('travelData', JSON.stringify(travelData));
   }
 
   function render() {
