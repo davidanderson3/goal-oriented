@@ -80,7 +80,15 @@ export function createGoalRow(goal, options = {}) {
     // ── Middle group: text ──
     const middle = document.createElement('div');
     middle.className = 'middle-group';
-    middle.textContent = goal.text;
+    const titleDiv = document.createElement('div');
+    titleDiv.textContent = goal.text;
+    middle.appendChild(titleDiv);
+    if (goal.notes) {
+        const noteDiv = document.createElement('div');
+        noteDiv.className = 'note-text';
+        noteDiv.textContent = goal.notes;
+        middle.appendChild(noteDiv);
+    }
     row.appendChild(middle);
 
     // ── Right group: scheduled + buttons ──
@@ -533,11 +541,17 @@ function attachEditButtons(item, buttonWrap) {
             editBtn.innerHTML = '💾';
 
             const textInput = document.createElement('input');
+            const notesInput = document.createElement('textarea');
             const scheduledInput = document.createElement('input');
             const parentSelect = document.createElement('select');
 
             textInput.value = item.text;
             textInput.style.width = '100%';
+
+            notesInput.value = item.notes || '';
+            notesInput.rows = 2;
+            notesInput.style.width = '100%';
+            notesInput.style.marginTop = '4px';
 
             scheduledInput.type = 'date';
             scheduledInput.value = item.scheduled || '';
@@ -565,6 +579,7 @@ function attachEditButtons(item, buttonWrap) {
 
             middle.innerHTML = '';
             middle.appendChild(textInput);
+            middle.appendChild(notesInput);
 
             due.innerHTML = '';
             due.appendChild(scheduledInput);
@@ -573,6 +588,7 @@ function attachEditButtons(item, buttonWrap) {
         } else {
             editing = false;
             const newText = middle.querySelector('input')?.value.trim();
+            const newNotes = middle.querySelector('textarea')?.value.trim();
             const newScheduled = due.querySelector('input')?.value.trim();
             const newParent = due.querySelector('select')?.value || null;
 
@@ -580,6 +596,7 @@ function attachEditButtons(item, buttonWrap) {
             const idx = all.findIndex(d => d.id === item.id);
             if (idx !== -1) {
                 all[idx].text = newText;
+                all[idx].notes = newNotes;
                 all[idx].scheduled = newScheduled;
                 all[idx].parentGoalId = newParent || null;
                 await saveDecisions(all);

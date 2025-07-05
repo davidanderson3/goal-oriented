@@ -112,6 +112,7 @@ export async function renderDailyTasks(currentUser, db) {
       id: generateId(),
       type: 'task',
       text: `${text}`,
+      notes: '',
       recurs: 'daily',
       parentGoalId: null,
       completed: false,
@@ -179,6 +180,7 @@ export async function renderDailyTasks(currentUser, db) {
         id: generateId(),
         type: 'task',
         text: `${text}`,
+        notes: '',
         recurs: 'weekly',
         parentGoalId: null,
         completed: false,
@@ -224,6 +226,7 @@ export async function renderDailyTasks(currentUser, db) {
         id: generateId(),
         type: 'task',
         text: `${text}`,
+        notes: '',
         recurs: 'monthly',
         parentGoalId: null,
         completed: false,
@@ -356,7 +359,15 @@ export async function renderDailyTasks(currentUser, db) {
     );
 
     const label = document.createElement('div');
-    label.textContent = task.text.replace(/^\[Daily\]\s*/, '');
+    const titleSpan = document.createElement('div');
+    titleSpan.textContent = task.text.replace(/^\[Daily\]\s*/, '');
+    label.appendChild(titleSpan);
+    if (task.notes) {
+      const noteSpan = document.createElement('div');
+      noteSpan.className = 'note-text';
+      noteSpan.textContent = task.notes;
+      label.appendChild(noteSpan);
+    }
     if (isDone) {
       Object.assign(label.style, { textDecoration: 'line-through', color: '#777' });
     }
@@ -380,23 +391,55 @@ export async function renderDailyTasks(currentUser, db) {
       }
     }));
 
-    // Edit
-    btns.append(makeIconBtn('✏️', 'Edit', async () => {
-      const original = task.text.replace(/^\[Daily\]\s*/, '');
-      const edited = prompt('Edit task:', original);
-      if (!edited || edited.trim() === original) return;
-      try {
-        const allDecs = await loadDecisions();
-        const idx = allDecs.findIndex(t => t.id === task.id);
-        if (idx === -1) return;
-        allDecs[idx].text = `[Daily] ${edited.trim()}`;
-        await saveDecisions(allDecs);
-        task.text = allDecs[idx].text;
-        label.textContent = edited.trim();
-      } catch {
-        alert('⚠️ Could not save edit.');
+    // Edit inline
+    let editing = false;
+    const editBtn = makeIconBtn('✏️', 'Edit', async () => {
+      if (!editing) {
+        editing = true;
+        editBtn.innerHTML = '💾';
+
+        const textInput = document.createElement('input');
+        textInput.value = task.text.replace(/^\[Daily\]\s*/, '');
+        textInput.style.width = '100%';
+
+        const notesInput = document.createElement('textarea');
+        notesInput.value = task.notes || '';
+        notesInput.rows = 2;
+        notesInput.style.width = '100%';
+        notesInput.style.marginTop = '4px';
+
+        label.innerHTML = '';
+        label.append(textInput, notesInput);
+      } else {
+        editing = false;
+        const newText = label.querySelector('input')?.value.trim();
+        const newNotes = label.querySelector('textarea')?.value.trim();
+        try {
+          const allDecs = await loadDecisions();
+          const idx = allDecs.findIndex(t => t.id === task.id);
+          if (idx === -1) return;
+          allDecs[idx].text = `[Daily] ${newText}`;
+          allDecs[idx].notes = newNotes;
+          await saveDecisions(allDecs);
+          task.text = allDecs[idx].text;
+          task.notes = newNotes;
+          editBtn.innerHTML = '✏️';
+          label.innerHTML = '';
+          const tSpan = document.createElement('div');
+          tSpan.textContent = newText;
+          label.appendChild(tSpan);
+          if (newNotes) {
+            const nSpan = document.createElement('div');
+            nSpan.className = 'note-text';
+            nSpan.textContent = newNotes;
+            label.appendChild(nSpan);
+          }
+        } catch {
+          alert('⚠️ Could not save edit.');
+        }
       }
-    }));
+    });
+    btns.append(editBtn);
 
     // Skip interval (clock + dropdown menu)
     const clockBtn = makeIconBtn('🕒', 'Skip interval', () => toggleMenu());

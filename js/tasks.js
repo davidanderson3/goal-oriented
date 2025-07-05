@@ -41,14 +41,50 @@ export function attachTaskButtons(item, row, listContainer, allDecisions) {
         }
     });
 
-    // Edit
+    // Edit inline
+    let editing = false;
     const editBtn = makeIconBtn('✏️', 'Edit task', async () => {
-        const newText = prompt('Edit task:', item.text)?.trim();
-        if (newText && newText !== item.text) {
+        const middle = row.querySelector('.middle-group');
+        if (!middle) return;
+
+        if (!editing) {
+            editing = true;
+            editBtn.innerHTML = '💾';
+
+            const textInput = document.createElement('input');
+            textInput.value = item.text;
+            textInput.style.width = '100%';
+
+            const notesInput = document.createElement('textarea');
+            notesInput.value = item.notes || '';
+            notesInput.rows = 2;
+            notesInput.style.width = '100%';
+            notesInput.style.marginTop = '4px';
+
+            middle.innerHTML = '';
+            middle.append(textInput, notesInput);
+        } else {
+            editing = false;
+            const newText = middle.querySelector('input')?.value.trim();
+            const newNotes = middle.querySelector('textarea')?.value.trim();
             const idx = allDecisions.findIndex(d => d.id === item.id);
-            allDecisions[idx].text = newText;
-            await saveDecisions(allDecisions);
-            row.querySelector('.middle-group').textContent = newText;
+            if (idx !== -1) {
+                allDecisions[idx].text = newText;
+                allDecisions[idx].notes = newNotes;
+                await saveDecisions(allDecisions);
+            }
+
+            editBtn.innerHTML = '✏️';
+            middle.innerHTML = '';
+            const tDiv = document.createElement('div');
+            tDiv.textContent = newText;
+            middle.appendChild(tDiv);
+            if (newNotes) {
+                const nDiv = document.createElement('div');
+                nDiv.className = 'note-text';
+                nDiv.textContent = newNotes;
+                middle.appendChild(nDiv);
+            }
         }
     });
 
@@ -244,6 +280,7 @@ export async function renderChildren(goal, all, container) {
         const newTask = {
             id: generateId(),
             text,
+            notes: '',
             completed: false,
             dateCompleted: '',
             parentGoalId: goal.id,
@@ -305,6 +342,12 @@ export async function renderChildren(goal, all, container) {
                 const title = document.createElement('div');
                 title.className = 'title-column';
                 title.textContent = item.text;
+                if (item.notes) {
+                    const n = document.createElement('div');
+                    n.className = 'note-text';
+                    n.textContent = item.notes;
+                    title.appendChild(n);
+                }
                 const res = document.createElement('div');
                 res.textContent = item.resolution ? `→ ${item.resolution}` : '';
                 Object.assign(res.style, {
